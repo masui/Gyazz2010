@@ -1,0 +1,9 @@
+require 'sdbm'
+
+db = SDBM.open('/www/www.pitecan.com/Gyazz/data/97630f635768122fe396a772996e8838/pair',0644)
+db.each { |key,val|
+  if key =~ /AddLink/ || val =~ /AddLink/ then
+    puts "#{key} #{val}"
+    db.delete(key)
+  end
+}

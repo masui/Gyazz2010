@@ -1,0 +1,19 @@
+# .htaccessを隠す裏技?
+AddHandler cgi-script htaccess
+
+RewriteEngine on
+
+RewriteRule ^([^/\.]*)/(.+)/edit$ /programs/edit.cgi?name=$1&title=$2 [L]
+RewriteRule ^([^/\.]*)/(.+)/text$ /programs/text.cgi?name=$1&title=$2 [L]
+RewriteRule ^([^/\.]*)/(.+)/slide$ /programs/slide.cgi?name=$1&title=$2 [L]
+RewriteRule ^([^/\.]*)/.settings$ /programs/settings.cgi?name=$1 [L]
+
+#RewriteRule ^$ /index.html [L]
+RewriteRule ^$ http://Gyazz.com/Gyazz/目次 [L]
+
+RewriteCond %{REQUEST_URI} !/stylesheets/
+RewriteCond %{REQUEST_URI} !/javascripts/
+RewriteCond %{REQUEST_URI} !/programs/
+RewriteRule ^([^/\.]*)/(.+)$ /programs/page.cgi?name=$1&title=$2 [L]
+RewriteRule ^([^/\.]*)/$ /programs/search.cgi?name=$1
+RewriteRule ^([^/\.]*)$ /programs/search.cgi?name=$1

@@ -1,0 +1,9 @@
+ファイル構成
+
+  javascripts
+  stylesheets
+  programs
+  log
+  data
+    data/01234567/89012345
+    data/01234567/backups/89012345/20090803012345

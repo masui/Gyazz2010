@@ -1,0 +1,7 @@
+require 'sdbm'
+
+imageid = SDBM.open("../data/imageid",0644)
+
+imageid.each { |key,val|
+  puts "#{key} => #{val}"
+}
