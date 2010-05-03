@@ -21,6 +21,18 @@ title = data.shift
 title_id = Digest::MD5.new.hexdigest(title).to_s
 file = "../data/#{name_id}/#{title_id}"
 
+# 書込み衝突を検知する仕組み。
+# ブラウザは書込み前のMD5値を持っており、これが現在のMD5値と
+# 違っていれば衝突なので書込みを行なわないようにする。
+orig_md5 = data.shift # ブラウザが知ってる修正前のMD5値
+curdata = ''
+curdata = File.open(file).read if File.exist?(file)
+cur_md5 = Digest::MD5.new.hexdigest(curdata)
+if cur_md5 != orig_md5 then
+  cgi.out { 'collision' }
+  exit
+end
+
 gyazoid = nil
 cookies = cgi.cookies['GyazoID']
 if cookies then
@@ -115,13 +127,12 @@ else
   repimage.delete(title)
 end
 
+File.open(file,"w"){ |f|
+  f.print newdata
+}
+new_md5 = Digest::MD5.new.hexdigest(newdata)
 
-# if title != '類語をみつける方法' then
-  File.open(file,"w"){ |f|
-    f.print newdata
-  }
-# end
-
+# 新しいmd5値をブラウザに伝える
 cgi.out {
-  ''
+  new_md5
 }

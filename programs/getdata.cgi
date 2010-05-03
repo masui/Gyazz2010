@@ -16,10 +16,6 @@ title = cgi.params['title'][0].to_s
 title_id = Digest::MD5.new.hexdigest(title).to_s
 version = cgi.params['version'][0].to_i
 
-File.open("/tmp/abc","w"){ |f|
-  f.puts "#{name}/#{title}"
-}
-
 files = []
 files << "../data/#{name_id}/#{title_id}"
 
@@ -61,19 +57,24 @@ if version > 0 then
   data = a
 end
 
+data_md5 = Digest::MD5.new.hexdigest(data)
+out = "#{data_md5}\n"
+
 if version > 0
   file =~ /(\d{14})$/
-  data = "#{$1}\n#{data}"
+  out << "#{$1}\n"
 end
 
 s = data.gsub(/[\s\r\n]/,'')
 if s.length == 0 then
-  data = '(empty)'
+  out << '(empty)'
+else
+  out << data
 end
 
-data = "\xef\xbb\xbf" + data # BOM
+out = "\xef\xbb\xbf" + out # BOM
 
 cgi.out {
-  data
+  out
 }
 

@@ -6,6 +6,7 @@ RewriteEngine on
 RewriteRule ^([^/\.]*)/(.+)/edit$ /programs/edit.cgi?name=$1&title=$2 [L]
 RewriteRule ^([^/\.]*)/(.+)/text$ /programs/text.cgi?name=$1&title=$2 [L]
 RewriteRule ^([^/\.]*)/(.+)/slide$ /programs/slide.cgi?name=$1&title=$2 [L]
+RewriteRule ^([^/\.]*)/(.+)/search$ /programs/search.cgi?name=$1&q=$2 [L]
 RewriteRule ^([^/\.]*)/.settings$ /programs/settings.cgi?name=$1 [L]
 
 #RewriteRule ^$ /index.html [L]

@@ -24,6 +24,11 @@ var query = null;
 var timemachine = false;
 var datestr = '';
 
+var reloadTimeout = null; //放っておくとリロードするように
+var reloadInterval = 10 * 60 * 1000; // 10分ごとにリロード
+
+var orig_md5; // getdata()したときのMD5
+
 var TOP = "http://gyazz.com"
 
 var KC = {
@@ -192,6 +197,9 @@ function getMouseY(e){
 var searchmode = false;
 
 function mousedown(event){
+  if(reloadTimeout) clearTimeout(reloadTimeout);
+  reloadTimeout = setTimeout(reload,reloadInterval);
+
   y = getMouseY(event);
   if(y < 40){
     searchmode = true;
@@ -276,6 +284,9 @@ function keyup(event){
 }
 
 function keydown(event){
+  if(reloadTimeout) clearTimeout(reloadTimeout);
+  reloadTimeout = setTimeout(reload,reloadInterval);
+
   var kc = keycode(event);
 if(kc == KC.enter) event.preventDefault();
   var sk = shiftkey(event);
@@ -447,6 +458,8 @@ function setup(){
     y.appendChild(x);
     contents.appendChild(y);
   }
+
+  reloadTimeout = setTimeout(reload,reloadInterval);
 }
 
 function display(delay){
@@ -627,13 +640,6 @@ function tag(s){
       s4 = RegExp.$1;
       s5 = RegExp.$2;
       s = s1 + '<a href="' + s4 + '.' + s5 + '"><img src="' + s4 + '.' + s5 + '" border="none" height=80></a>' + s3;
-//      if(s2.match(/gyazo.com\/(.*)\.png$/i)){
-//	gyazoid = RegExp.$1
-//        s = s1 + '<a href="http://gyazo.com/' + gyazoid + '.png"><img src="' + s4 + '.' + s5 + '" border=none height=80></a>' + s3;
-//      }
-//      else {
-//        s = s1 + '<img src="' + s4 + '.' + s5 + ' height=80">' + s3;
-//      }
     }
     else {
       s = s1 + '<b>' + s2 + '</b>' + s3;
@@ -653,13 +659,6 @@ function tag(s){
       s4 = RegExp.$1;
       s5 = RegExp.$2;
       s = s1 + '<a href="' + s4 + '.' + s5 + '"><img src="' + s4 + '.' + s5 + '" border="none"></a>' + s3;
-//      if(s2.match(/gyazo.com\/(.*)\.png$/i)){
-//	gyazoid = RegExp.$1
-//        s = s1 + '<a href="http://gyazo.com/' + gyazoid + '.png"><img src="' + s4 + '.' + s5 + '" border=none></a>' + s3;
-//      }
-//      else {
-//        s = s1 + '<img src="' + s4 + '.' + s5 + '">' + s3;
-//      }
     }
     else if(s2.match(/^(http[^ ]+) (.*)$/)){
       s4 = RegExp.$1;
@@ -712,11 +711,29 @@ function tag(s){
         }
 	addtag(s2);
     }
+    else if(s2.match(/^([a-fA-F0-9]{32})\.(\w+) (.*)$/)){ // (MD5).ext をpitecan.com上のデータにリンク (2010 5/1)
+	md5 = RegExp.$1;
+	ext = RegExp.$2;
+	comment = RegExp.$3;
+        s = s1 + '<a href="http://pitecan.com/' + md5 + '.' + ext + '" class="link">' + comment + '</a>' + s3;
+    }
+    else if(s2.match(/^@([a-zA-Z0-9_]+)$/)){ // @名前 を twitterへのリンクにする (2010 4/27)
+        twittername = RegExp.$1
+        s = s1 + '<a href="http://twitter.com/' + twittername + '" class="link">@' + twittername + '</a>' + s3;
+    }
+    else if(s2.match(/^(.+)::(.+)$/)){ //  Wikiname::Title で他Wikiに飛ぶ (2010 4/27)
+       wikiname = RegExp.$1;
+       wikititle = RegExp.$2;
+       url = TOP + '/' + wikiname + '/' + encodeURIComponent(wikititle).replace(/%2F/g,"/");
+       // s = s1 + '<a href="' + url + '" class="link">' + wikiname + '::' + wikititle + '</a>' + s3; このリンクは五月蝿い...
+       s = s1 + '<a href="' + url + '" class="link" title="' + wikiname + '::' + wikititle + '">' + '[' + wikititle + ']</a>' + s3;
+    }
     else { // タグ/リンク
 	s = s1 + '<a href="' + TOP + '/' + name + '/' + encodeURIComponent(s2).replace(/%2F/g,"/") + '" class="tag">' + s2 + '</a>' + s3;
       addtag(s2);
     }
   }
+  //  alert(s);
   return s;
 }
 
@@ -738,8 +755,20 @@ function writedata(){
   xmlhttp.open("POST", TOP + "/programs/postdata.cgi" , true);
   xmlhttp.setRequestHeader("Content-Type" , "application/x-www-form-urlencoded");
   xmlhttp.setRequestHeader("Content-Type" , "text/html; charset=utf-8"); //2006/11/10追加 for Safari
-  postdata = "data=" + encodeURIComponent(name + "\n" + title + "\n" + data.join("\n"));
+  postdata = "data=" + encodeURIComponent(name + "\n" + title + "\n" + orig_md5 + "\n" + data.join("\n"));
   xmlhttp.send(postdata);
+  xmlhttp.onreadystatechange=function() {
+    if (xmlhttp.readyState==4) {
+      response = xmlhttp.responseText;
+      if(response == 'collision'){
+	  alert('書込み衝突が発生しました。別の場所で同時に修正が行なわれている可能性があります。リロードして編集をやり直して下さい。');
+      }
+      else {
+	  orig_md5 = response;
+	  //	  	  alert(orig_md5);
+      }
+    }
+  }
 
   var input = document.getElementById("newtext");
   input.style.backgroundColor = "#ddd";
@@ -761,6 +790,7 @@ function getdata(){ // 20050815123456.utf のようなテキストを読み出�
       xx = xmlhttp.responseText;
       //xx = decodeURIComponent(xmlhttp.responseText);
       d = xx.split(/\n/);
+      orig_md5 = d.shift();
       if(version > 0){
         datestr = d.shift();
       }
@@ -863,3 +893,12 @@ function addimage(id)
 
 //setup();
 //getdata();
+
+// 最新のページに更新
+function reload()
+{
+    version = 0;
+    getdata();
+    display();
+    reloadTimeout = setTimeout(reload,reloadInterval);
+}

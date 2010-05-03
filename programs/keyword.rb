@@ -6,13 +6,13 @@ class String
     end
     while s.sub!(/\[\[([^\[\n\r ]+\/) [^\]]+\]\]/,'') do
       kw = $1
-      if kw !~ /^http/ && kw !~ /pdf / then
+      if kw !~ /^http/ && kw !~ /pdf / && kw !~ /^@/ && kw !~ /::/ then
         a << kw
       end
     end
     while s.sub!(/\[\[([^\[\n\r]+)\]\]/,'') do
       kw = $1
-      if kw !~ /^http/ && kw !~ /pdf / then
+      if kw !~ /^http/ && kw !~ /pdf / && kw !~ /^@/ && kw !~ /::/ then
         a << kw
       end
     end

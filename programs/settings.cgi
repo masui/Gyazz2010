@@ -40,6 +40,8 @@ cgi.out {
       } +
       sh.p +
       sh.input('id' => 'protected', 'type' => 'checkbox', 'checked' => '') + '編集を制限する' +
+      sh.p +
+      sh.input('id' => 'searchable', 'type' => 'checkbox') + '検索エンジンのクロールを許可する' +
 <<EOF
 <script type="text/javascript">
 var TOP = "http://gyazz.com";
@@ -58,7 +60,7 @@ function createXmlHttp(){
 var attr = [];
 
 function sendattr(){
-  file = TOP + "/programs/setattr.cgi?name=" + encodeURIComponent(name) + "&protected=" + attr['protected'];
+  file = TOP + "/programs/setattr.cgi?name=" + encodeURIComponent(name) + "&protected=" + attr['protected'] + "&searchable=" + attr['searchable'];
   xmlhttp = createXmlHttp();
   xmlhttp.open("GET", file , true);
   xmlhttp.send("");
@@ -74,6 +76,10 @@ function setattr(event){
 var checkbox_protected = document.getElementById('protected');
 checkbox_protected.addEventListener("change", setattr, false);
 checkbox_protected.checked = #{attr['protected'] == 'true' ? 'true' : 'false'};
+
+var checkbox_searchable = document.getElementById('searchable');
+checkbox_searchable.addEventListener("change", setattr, false);
+checkbox_searchable.checked = #{attr['searchable'] == 'true' ? 'true' : 'false'};
 
 </script>
 EOF

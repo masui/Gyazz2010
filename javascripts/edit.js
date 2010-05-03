@@ -35,6 +35,19 @@ function writedata(){
   xmlhttp.setRequestHeader("Content-Type" , "text/html; charset=utf-8"); //2006/11/10追加 for Safari
   var textarea = document.getElementById('contents');
   data = textarea.value;
-  postdata = "data=" + encodeURIComponent(name + "\n" + title + "\n" + data);
+  //postdata = "data=" + encodeURIComponent(name + "\n" + title + "\n" + data);
+  // xmlhttp.send(postdata);
+  postdata = "data=" + encodeURIComponent(name + "\n" + title + "\n" + orig_md5 + "\n" + data);
   xmlhttp.send(postdata);
+  xmlhttp.onreadystatechange=function() {
+    if (xmlhttp.readyState==4) {
+      response = xmlhttp.responseText;
+      if(response == 'collision'){
+	  alert('書込み衝突が発生しました。別の場所で同時に修正が行なわれている可能性があります。リロードして編集をやり直して下さい。');
+      }
+      else {
+	  orig_md5 = response;
+      }
+    }
+  }
 }

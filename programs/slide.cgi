@@ -83,24 +83,25 @@ cgi.out {
 </script>
 <style type="text/css">
 <!--
-img {
+img.slide {
   position:absolute;
   top:0;
   left:0;
   width:100%;
 }
-div {
+div.slide {
   position:absolute;
   color:white;
   font-size:20pt;
 }
 -->
 </style>
+<link rel="stylesheet" href="/#{name}/.CSS/text" type="text/css; charset=utf-8">
 </head>
 <body style="margin:0;border:0;padding:0;overflow:hidden;">
 
-<img id='photo'>
-<div id='comment'></div>
+<img class="slide" id='photo'>
+<div class="slide" id='comment'></div>
 
 <script type="text/javascript">
 var image = [];

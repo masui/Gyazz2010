@@ -7,6 +7,7 @@
 require 'cgi'
 require 'digest/md5'
 require 'html'
+require 'sdbm'
 
 GYAZZTOP = "http://gyazz.com"
 
@@ -35,18 +36,23 @@ if data == '' then
   end
 end
 
+attr = SDBM.open("../data/#{name_id}/attr",0644)
+robotsattr = (attr['searchable'] == 'true' ? "index,follow" : "noindex,nofollow")
+
 cgi.out {
   sh.html {
     sh.head {
-      sh.meta('http-equiv' => "Content-Type", 'content' => "text/html; charset=utf-8") +
-      sh.title{ "#{name}/#{title}" } +
+      sh.meta('http-equiv' => "Content-Type", 'content' => "text/html; charset=utf-8") + "\n" +
+      sh.meta('name' => "robots", 'content' => "#{robotsattr}") + "\n" +
+      sh.title{ "#{name}/#{title}" } + "\n" +
       sh.link('rel' => "stylesheet", 'href' => "#{GYAZZTOP}/stylesheets/page.css", 'type' => "text/css; charset=utf-8") +
       sh.script('src' => "#{GYAZZTOP}/javascripts/edit.js", 'type' => 'text/javascript'){ } +
       sh.script('type' => 'text/javascript'){
          name_escape = name.gsub(/'/,'\\\\\'')
          title_escape = title.gsub(/'/,'\\\\\'')
          "var name = '#{name_escape}';\n" +
-         "var title = '#{title_escape}';\n"
+         "var title = '#{title_escape}';\n" +
+         "var orig_md5 = '#{md5(data)}';\n"
       }
     } +
     sh.body {

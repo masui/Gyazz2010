@@ -9,6 +9,7 @@ require 'digest/md5'
 require 'html'
 require 'keyword'
 require 'pair'
+require 'sdbm'
 
 $KCODE = 'u'
 
@@ -94,6 +95,8 @@ pair.each { |key1,key2|
 
 weight = {}
 pair.each(title) { |key|
+next if key =~ /^@/ # 苦しい。pairをクリアしなければ
+next if key =~ /::/ # 苦しい。pairをクリアしなければ
   weight[key] = linkcount[key]
 }
 newweight = {}
@@ -152,7 +155,9 @@ links = weight.keys.sort { |key1,key2|
 <<EOF
 <div style="height:64;width:64;margin:2;float:left">
 <center>
-<img src='http://gyazo.com/#{repimage[t]}.png' style='max-height:64;max-width:64;border:none;width:expression(document.body.clientWidth < 64? "64px" : document.body.clientWidth > 64? "64px" : "auto");'>
+<img src='http://gyazo.com/#{repimage[t]}.png'
+title='#{t}'
+style='max-height:64;max-width:64;border:none;width:expression(document.body.clientWidth < 64? "64px" : document.body.clientWidth > 64? "64px" : "auto");'>
 </center>
 </div>
 EOF
@@ -177,23 +182,27 @@ EOF
   end
 }.join(' ')
 
+attr = SDBM.open("../data/#{name_id}/attr",0644)
+robotsattr = (attr['searchable'] == 'true' ? "index,follow" : "noindex,nofollow")
+
 cgi.out('Pragma' => 'no-cache', 'Cache-Control' => 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0', 'Expires' => 'Thu, 01 Dec 1994 16:00:00 GMT'){
   sh.html {
     sh.head {
-      sh.meta('http-equiv' => "Content-Type", 'content' => "text/html; charset=utf-8") +
-      sh.meta('http-equiv' => "pragma", 'content' => "no-cache") +
-      sh.meta('http-equiv' => "cache-control", 'content' => "no-cache") +
-      sh.meta('http-equiv' => "cache-control", 'content' => "no-store") +
-      sh.meta('http-equiv' => "cache-control", 'content' => "must-revalidate") +
-      sh.meta('http-equiv' => "Expires", 'content' => "Thu, 01 Dec 1994 16:00:00 GMT") +
-      sh.title{ title } +
-      sh.link('rel' => "stylesheet", 'href' => "#{GYAZZTOP}/stylesheets/page.css", 'type' => "text/css; charset=utf-8") +
-      sh.link('rel' => "stylesheet", 'href' => "#{GYAZZTOP}/#{name}/.CSS/text", 'type' => "text/css; charset=utf-8") +
-      sh.script('src' => "#{GYAZZTOP}/javascripts/pbdict.js", 'type' => 'text/javascript'){ } +
-      sh.script('src' => "#{GYAZZTOP}/javascripts/pbsearch.js", 'type' => 'text/javascript'){ } +
-      sh.script('src' => "#{GYAZZTOP}/javascripts/utf.js", 'type' => 'text/javascript'){ } +
-      sh.script('src' => "#{GYAZZTOP}/javascripts/md5.js", 'type' => 'text/javascript'){ } +
-      sh.script('src' => "#{GYAZZTOP}/javascripts/listedit.js", 'type' => 'text/javascript'){ } +
+      sh.meta('http-equiv' => "Content-Type", 'content' => "text/html; charset=utf-8") + "\n" +
+      sh.meta('http-equiv' => "pragma", 'content' => "no-cache") + "\n" +
+      sh.meta('http-equiv' => "cache-control", 'content' => "no-cache") + "\n" +
+      sh.meta('http-equiv' => "cache-control", 'content' => "no-store") + "\n" +
+      sh.meta('http-equiv' => "cache-control", 'content' => "must-revalidate") + "\n" +
+      sh.meta('http-equiv' => "Expires", 'content' => "Thu, 01 Dec 1994 16:00:00 GMT") + "\n" +
+      sh.meta('name' => "robots", 'content' => "#{robotsattr}") + "\n" +
+      sh.title{ title } + "\n" +
+      sh.link('rel' => "stylesheet", 'href' => "#{GYAZZTOP}/stylesheets/page.css", 'type' => "text/css; charset=utf-8") + "\n" +
+      sh.link('rel' => "stylesheet", 'href' => "#{GYAZZTOP}/#{name}/.CSS/text", 'type' => "text/css; charset=utf-8") + "\n" +
+      sh.script('src' => "#{GYAZZTOP}/javascripts/pbdict.js", 'type' => 'text/javascript'){ } + "\n" +
+      sh.script('src' => "#{GYAZZTOP}/javascripts/pbsearch.js", 'type' => 'text/javascript'){ } + "\n" +
+      sh.script('src' => "#{GYAZZTOP}/javascripts/utf.js", 'type' => 'text/javascript'){ } + "\n" +
+      sh.script('src' => "#{GYAZZTOP}/javascripts/md5.js", 'type' => 'text/javascript'){ } + "\n" +
+      sh.script('src' => "#{GYAZZTOP}/javascripts/listedit.js", 'type' => 'text/javascript'){ } + "\n" +
       sh.script('type' => 'text/javascript'){
          name_escape = name.gsub(/'/,'\\\\\'')
          title_escape = title.gsub(/'/,'\\\\\'')
@@ -211,7 +220,8 @@ cgi.out('Pragma' => 'no-cache', 'Cache-Control' => 'no-store, no-cache, must-rev
         } +
         sh.form('action' => "#{GYAZZTOP}/programs/search.cgi", 'method' => "get", 'style' => "float:right;font-size:12pt;"){
           sh.input('height' => '20', 'name' => 'q', 'type' => 'text') + ' ' +
-          sh.input('name' => 'commit', 'type' => 'submit', 'value' => '検索') +
+#          sh.input('name' => 'commit', 'type' => 'submit', 'value' => '検索') +
+          sh.input('type' => 'submit', 'value' => '検索') +
           sh.input('name' => 'name', 'type' => 'hidden', 'value' => name)
         } +
         sh.span('class' => 'language', 'id' => 'datestr'){ }
