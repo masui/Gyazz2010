@@ -8,8 +8,7 @@ require 'cgi'
 require 'sdbm'
 require 'html'
 require 'digest/md5'
-
-GYAZZTOP = "http://gyazz.com"
+require 'config'
 
 cgi = CGI.new("html3")
 sh = SimpleHtmlGenerator.new
@@ -44,7 +43,7 @@ cgi.out {
       sh.input('id' => 'searchable', 'type' => 'checkbox') + '検索エンジンのクロールを許可する' +
 <<EOF
 <script type="text/javascript">
-var TOP = "http://gyazz.com";
+var TOP = "#{GYAZZTOP}";
 var name = "#{name}";
 
 function createXmlHttp(){

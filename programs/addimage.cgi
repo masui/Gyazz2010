@@ -7,8 +7,7 @@
 require 'cgi'
 require 'digest/md5'
 require 'html'
-
-GYAZZTOP = "http://gyazz.com"
+require 'config'
 
 def md5(s)
   Digest::MD5.new.hexdigest(s).to_s
@@ -24,7 +23,7 @@ title_id = md5(title)                    # そのMD5値    (e.g. b7b1e314614cf32
 
 filename = "../data/#{name_id}/#{title_id}"
 wikitop = "../data/#{name_id}"
-urltop = "http://gyazz.com/#{name}"
+urltop = "#{GYAZZTOP}/#{name}"
 
 data = ''
 if File.exist?(filename) then

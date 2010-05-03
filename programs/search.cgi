@@ -9,6 +9,7 @@ require 'digest/md5'
 require 'html'
 require 'pair'
 require 'set'
+require 'config'
 
 def md5(name)
   Digest::MD5.new.hexdigest("#{name}").to_s
@@ -19,9 +20,8 @@ name = cgi.params['name'][0].to_s        # Wikiの名前   (e.g. masui)
 name_id = md5(name)                      # そのMD5値    (e.g. 451dc4c8383accedc009c9d6b334d851)
 q = cgi.params['q'][0].to_s
 
-GYAZZTOP = "http://gyazz.com"
 wikitop = "../data/#{name_id}"
-urltop = "http://gyazz.com/#{name}"
+urltop = "#{GYAZZTOP}/#{name}"
 if !File.directory?(wikitop) then
   Dir.mkdir(wikitop)
 end

@@ -1,0 +1,9 @@
+require 'sdbm'
+
+datamd5 = ARGV.shift
+exit unless datamd5
+
+db = SDBM.open("/www/www.pitecan.com/Gyazz/data/#{datamd5}/pair",0644)
+db.each { |key,val|
+  puts "#{key} #{val}"
+}

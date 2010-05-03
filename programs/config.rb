@@ -1,0 +1,5 @@
+#
+#
+#
+
+GYAZZTOP = "http://gyazz.com"

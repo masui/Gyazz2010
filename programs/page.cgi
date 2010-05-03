@@ -10,12 +10,9 @@ require 'html'
 require 'keyword'
 require 'pair'
 require 'sdbm'
+require 'config'
 
 $KCODE = 'u'
-
-# URLTOP = '/~masui/Wiki'
-# URLTOP = ''                # for pitecan.com
-GYAZZTOP = "http://gyazz.com"
 
 def md5(s)
    Digest::MD5.new.hexdigest(s).to_s
@@ -56,7 +53,7 @@ require 'uri'
 require 'set'
 
 wikitop = "../data/#{name_id}"
-urltop = "http://gyazz.com/#{name}"
+urltop = "#{GYAZZTOP}/#{name}"
 if !File.directory?(wikitop) then
   Dir.mkdir(wikitop)
 end

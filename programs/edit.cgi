@@ -8,8 +8,7 @@ require 'cgi'
 require 'digest/md5'
 require 'html'
 require 'sdbm'
-
-GYAZZTOP = "http://gyazz.com"
+require 'config'
 
 def md5(s)
   Digest::MD5.new.hexdigest(s).to_s
@@ -27,7 +26,7 @@ version = cgi.params['version'][0].to_i
 filename = "../data/#{name_id}/#{title_id}"
 
 wikitop = "../data/#{name_id}"
-urltop = "http://gyazz.com/#{name}"
+urltop = "#{GYAZZTOP}/#{name}"
 
 if data == '' then
   begin
