@@ -29,7 +29,7 @@ var reloadInterval = 10 * 60 * 1000; // 10分ごとにリロード
 
 var orig_md5; // getdata()したときのMD5
 
-var TOP = "http://gyazz.com"
+//var TOP = "http://gyazz.com"
 
 var KC = {
   tab:9, enter:13, left:37, up:38, right:39, down:40

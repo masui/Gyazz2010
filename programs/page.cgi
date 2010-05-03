@@ -205,7 +205,8 @@ cgi.out('Pragma' => 'no-cache', 'Cache-Control' => 'no-store, no-cache, must-rev
          title_escape = title.gsub(/'/,'\\\\\'')
          "var name = '#{name_escape}';\n" +
          "var title = '#{title_escape}';\n" +
-         "var version = #{version};\n"
+         "var version = #{version};\n" +
+         "var TOP = #{GYAZZTOP};\n"
       }
     } +
     sh.body {
